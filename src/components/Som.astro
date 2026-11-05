@@ -1,16 +1,37 @@
 ---
-import { Image } from 'astro:assets';
-import { musicas, videos, spotifyArtistaId, redes } from '../data/banda';
+import { Image, getImage } from 'astro:assets';
+import { musicas, videos, redes } from '../data/banda';
+import capaSpotify from '../assets/fotos/capa-spotify.jpg';
 import posterAlgo from '../assets/fotos/show-paim.jpg';
 import posterAnimal from '../assets/fotos/show-jpeg.jpg';
+import posterLive from '../assets/fotos/live-caseira.jpg';
 import Icone from './Icone.astro';
 
-const posters: Record<string, ImageMetadata> = {
+// Capa = miniatura do próprio YouTube. A foto local só aparece se a miniatura não carregar.
+const reserva: Record<string, ImageMetadata> = {
   OY0fS3AOQDw: posterAlgo,
   soFQTg9EfDw: posterAnimal,
+  dWnkKPz0Ubk: posterLive,
 };
+// As duas músicas têm capa em alta; a live só tem a miniatura padrão
+const miniatura: Record<string, string> = {
+  OY0fS3AOQDw: 'maxresdefault',
+  soFQTg9EfDw: 'maxresdefault',
+  dWnkKPz0Ubk: 'hqdefault',
+};
+const capas = await Promise.all(
+  videos.map(async (v) => {
+    const local = await getImage({ src: reserva[v.youtubeId], width: 1280, format: 'webp' });
+    const yt = `https://i.ytimg.com/vi/${v.youtubeId}/${miniatura[v.youtubeId]}.jpg`;
+    const hq = `https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`;
+    const proximas = miniatura[v.youtubeId] === 'hqdefault' ? [local.src] : [hq, local.src];
+    return { ...v, yt, proximas: proximas.join('|') };
+  }),
+);
 const spotify = redes.find((r) => r.icone === 'spotify')!;
 const youtube = redes.find((r) => r.icone === 'youtube')!;
+const trocaCapa =
+  "var n=(this.dataset.f||'').split('|').filter(Boolean);if(!n.length){this.onerror=null;return}this.src=n.shift();this.dataset.f=n.join('|')";
 ---
 <section class="section som" id="som" aria-labelledby="titulo-som">
   <div class="wrap som__ouca">
@@ -20,43 +41,33 @@ const youtube = redes.find((r) => r.icone === 'youtube')!;
         {musicas.map((m, i) => (
           <li data-reveal style={`--i:${i + 1}`}>
             <span class="som__num">{String(i + 1).padStart(2, '0')}</span>
-            <div>
-              <p class="display som__faixa">{m.titulo}</p>
-              <p class="som__meta">Single, {m.lancamento.toLowerCase()}. Produção {m.producao}.</p>
-            </div>
+            <p class="display som__faixa">{m.titulo}</p>
           </li>
         ))}
       </ol>
-      <a class="btn btn--ghost" href={spotify.url} target="_blank" rel="noopener" data-reveal style="--i:3">
-        <Icone nome="spotify" tamanho={18} /> Abrir no Spotify
+      <a class="btn btn--ghost" href={spotify.url} target="_blank" rel="noopener" data-reveal style="--i:4">
+        <Icone nome="spotify" tamanho={18} /> Ouvir no Spotify
       </a>
     </div>
-    <div class="som__player" data-reveal style="--i:1">
-      <iframe
-        title="Contra Cultura no Spotify"
-        src={`https://open.spotify.com/embed/artist/${spotifyArtistaId}?utm_source=generator&theme=0`}
-        width="100%"
-        height="452"
-        loading="lazy"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      ></iframe>
-    </div>
+    <a class="som__capa" href={spotify.url} target="_blank" rel="noopener" aria-label="Abrir o perfil da Contra Cultura no Spotify" data-reveal style="--i:1">
+      <Image src={capaSpotify} alt="Perfil da Contra Cultura no Spotify, com as músicas Lis-Lírio, Animal e Algo Parecido" widths={[600, 1216]} sizes="(max-width: 900px) 100vw, 55vw" />
+    </a>
   </div>
 
   <div class="wrap som__assista">
     <h2 class="display h2" data-reveal>Assista</h2>
     <div class="som__videos">
-      {videos.map((v, i) => (
-        <figure class="video" data-reveal style={`--i:${i}`}>
-          <button class="video__capa" type="button" data-youtube={v.youtubeId} data-titulo={v.titulo} aria-label={`Assistir ao clipe de ${v.titulo}`}>
-            <Image src={posters[v.youtubeId]} alt="" widths={[640, 960, 1400]} sizes="(max-width: 760px) 100vw, 60vw" />
+      {capas.map((v, i) => (
+        <figure class={`video video--${i + 1}`} data-reveal style={`--i:${i}`}>
+          <button class="video__capa" type="button" data-youtube={v.youtubeId} data-titulo={v.titulo} aria-label={`Assistir: ${v.titulo}`}>
+            <img src={v.yt} data-f={v.proximas} onerror={trocaCapa} alt="" loading="lazy" decoding="async" width="1280" height="720" />
             <span class="video__play" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
             </span>
           </button>
           <figcaption>
             <span class="display video__titulo">{v.titulo}</span>
-            <span class="video__tipo">Clipe oficial</span>
+            <span class="video__tipo">{v.tipo}</span>
           </figcaption>
         </figure>
       ))}
@@ -75,34 +86,43 @@ const youtube = redes.find((r) => r.icone === 'youtube')!;
     align-items: center;
   }
   .som__intro { display: grid; gap: 36px; justify-items: start; }
-  .som__faixas { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; width: 100%; }
+  .som__faixas { list-style: none; margin: 0; padding: 0; display: grid; width: 100%; }
   .som__faixas li {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 20px;
+    grid-template-columns: 2.4em minmax(0, 1fr);
+    gap: 12px;
     align-items: baseline;
-    padding-top: 22px;
+    padding-block: 18px;
     border-top: 1px solid var(--line);
   }
+  .som__faixas li:last-child { border-bottom: 1px solid var(--line); }
   .som__num { font-family: var(--font-mono); font-size: 14px; color: var(--accent); }
-  .som__faixa { font-size: clamp(36px, 4vw, 60px); }
-  .som__meta { color: var(--muted); font-size: 15px; margin-top: 6px; }
-  .som__player {
+  .som__faixa { font-size: clamp(38px, 4.2vw, 64px); }
+
+  .som__capa {
+    display: block;
     min-width: 0;
+    overflow: hidden;
     background: var(--surface);
-    min-height: 452px;
   }
-  .som__player iframe { border: 0; width: 100%; }
+  .som__capa :global(img) {
+    width: 100%;
+    height: auto;
+    transition: transform 1.2s var(--ease-out);
+  }
+  .som__capa:hover :global(img) { transform: scale(1.03); }
 
   .som__assista { margin-top: clamp(96px, 12vw, 180px); display: grid; gap: clamp(32px, 4vw, 56px); }
+  /* Três vídeos: um em destaque à esquerda, dois empilhados à direita */
   .som__videos {
     display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: clamp(16px, 2vw, 28px);
-    align-items: start;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: clamp(20px, 2vw, 28px);
   }
-  .video:nth-child(2) { margin-top: clamp(0px, 12vw, 180px); }
-  .video { margin: 0; display: grid; gap: 16px; min-width: 0; }
+  /* O vídeo em destaque ocupa a altura toda da coluna da direita */
+  .video--1 { grid-row: span 2; grid-template-rows: minmax(0, 1fr) auto; }
+  .video--1 .video__capa { aspect-ratio: auto; height: 100%; min-height: 300px; }
+  .video { margin: 0; display: grid; gap: 14px; align-content: start; min-width: 0; }
   .video__capa {
     position: relative;
     display: block;
@@ -114,20 +134,20 @@ const youtube = redes.find((r) => r.icone === 'youtube')!;
     cursor: pointer;
     overflow: hidden;
   }
-  .video__capa :global(img) {
+  .video__capa img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.82;
     transition: transform 1.2s var(--ease-out), opacity 0.4s;
+    opacity: 0.9;
   }
-  .video__capa:hover :global(img) { transform: scale(1.04); opacity: 1; }
+  .video__capa:hover img { transform: scale(1.04); opacity: 1; }
   .video__play {
     position: absolute;
-    left: 24px;
-    bottom: 24px;
-    width: 72px;
-    height: 72px;
+    left: clamp(14px, 1.6vw, 24px);
+    bottom: clamp(14px, 1.6vw, 24px);
+    width: clamp(52px, 4.6vw, 72px);
+    aspect-ratio: 1;
     display: grid;
     place-items: center;
     background: var(--accent);
@@ -136,9 +156,10 @@ const youtube = redes.find((r) => r.icone === 'youtube')!;
   }
   .video__capa:hover .video__play { transform: scale(1.08); }
   .video :global(iframe) { width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; }
-  .video figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
-  .video__titulo { font-size: clamp(28px, 2.6vw, 40px); }
-  .video__tipo { color: var(--muted); font-size: 14px; white-space: nowrap; }
+  .video figcaption { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+  .video__titulo { font-size: clamp(26px, 2.2vw, 34px); }
+  .video--1 .video__titulo { font-size: clamp(30px, 3.2vw, 48px); }
+  .video__tipo { color: var(--muted); font-size: 14px; }
   .som__canal {
     display: inline-flex;
     align-items: center;
@@ -154,6 +175,7 @@ const youtube = redes.find((r) => r.icone === 'youtube')!;
   @media (max-width: 900px) {
     .som__ouca { grid-template-columns: 1fr; }
     .som__videos { grid-template-columns: 1fr; }
-    .video:nth-child(2) { margin-top: 0; }
+    .video--1 { grid-row: auto; grid-template-rows: auto; }
+    .video--1 .video__capa { aspect-ratio: 16 / 9; height: auto; min-height: 0; }
   }
 </style>

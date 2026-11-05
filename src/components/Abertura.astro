@@ -1,8 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import banner from '../assets/fotos/banner.jpg';
-import logo from '../assets/logo.png';
-import { banda, lugares } from '../data/banda';
+import { banda } from '../data/banda';
 ---
 <section class="abertura" id="topo" aria-labelledby="titulo-banda">
   <div class="wrap abertura__texto">
@@ -33,20 +32,6 @@ import { banda, lugares } from '../data/banda';
     </div>
   </div>
 
-  <div class="faixa" aria-label="Lugares onde a banda já tocou">
-    <div class="faixa__trilho">
-      {[0, 1].map((copia) => (
-        <ul class="faixa__lista" aria-hidden={copia === 1 ? 'true' : undefined}>
-          {lugares.map((l) => (
-            <li>
-              <span>{l.nome}</span>
-              <Image src={logo} alt="" width={22} height={22} />
-            </li>
-          ))}
-        </ul>
-      ))}
-    </div>
-  </div>
 </section>
 
 <style>
@@ -92,44 +77,6 @@ import { banda, lugares } from '../data/banda';
     will-change: transform;
   }
 
-  /* Faixa com os lugares: o único letreiro em movimento da página */
-  .faixa {
-    overflow: hidden;
-    background: var(--accent);
-    color: var(--accent-ink);
-    padding-block: 18px;
-  }
-  .faixa__trilho { display: flex; width: max-content; }
-  .faixa__lista {
-    display: flex;
-    flex-shrink: 0;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .faixa__lista li {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    padding-right: 28px;
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-variation-settings: 'wdth' 62;
-    text-transform: uppercase;
-    font-size: clamp(26px, 3.2vw, 44px);
-    line-height: 1;
-    white-space: nowrap;
-  }
-  .faixa__lista :global(img) {
-    width: 22px;
-    height: 22px;
-    filter: brightness(0) invert(1);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .faixa__trilho { animation: faixa 38s linear infinite; }
-    .faixa:hover .faixa__trilho { animation-play-state: paused; }
-  }
-  @keyframes faixa { to { transform: translateX(-50%); } }
 
   /* Entrada do título ao carregar */
   @media (prefers-reduced-motion: no-preference) {

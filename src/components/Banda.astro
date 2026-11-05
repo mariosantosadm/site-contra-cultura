@@ -19,7 +19,7 @@ const fotos: Record<string, ImageMetadata> = { Paim: paim, Mamaco: mamaco, JPEG:
       {integrantes.map((p, i) => (
         <li class="membro" data-reveal style={`--i:${i}`}>
           <div class="membro__foto">
-            <Image src={fotos[p.nome]} alt={`${p.nome}, ${p.funcao.toLowerCase()}`} widths={[480, 800]} sizes="(max-width: 760px) 100vw, 33vw" data-parallax={i === 1 ? '-6' : '6'} />
+            <Image src={fotos[p.nome]} alt={`${p.nome}, ${p.funcao.toLowerCase()}`} widths={[480, 800]} sizes="(max-width: 760px) 100vw, 33vw" />
           </div>
           <p class="display membro__nome">{p.nome}</p>
           <p class="membro__funcao">{p.funcao}</p>
@@ -40,8 +40,6 @@ const fotos: Record<string, ImageMetadata> = { Paim: paim, Mamaco: mamaco, JPEG:
     gap: clamp(16px, 2vw, 28px);
     align-items: start;
   }
-  .membro:nth-child(2) { margin-top: clamp(0px, 9vw, 140px); }
-  .membro:nth-child(3) { margin-top: clamp(0px, 4vw, 60px); }
   .membro__foto {
     aspect-ratio: 4 / 5;
     overflow: hidden;
@@ -50,15 +48,13 @@ const fotos: Record<string, ImageMetadata> = { Paim: paim, Mamaco: mamaco, JPEG:
   }
   .membro__foto :global(img) {
     width: 100%;
-    height: 112%;
+    height: 100%;
     object-fit: cover;
-    margin-top: -6%;
   }
   .membro__nome { font-size: clamp(44px, 5vw, 76px); margin-top: 20px; }
   .membro__funcao { color: var(--muted); margin-top: 4px; }
 
   @media (max-width: 760px) {
     .banda__grade { grid-template-columns: 1fr; gap: 48px; }
-    .membro:nth-child(n) { margin-top: 0; }
   }
 </style>

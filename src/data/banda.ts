@@ -8,6 +8,9 @@ import unbPlateia from '../assets/lugares/unb-plateia.jpg';
 import alquimia from '../assets/lugares/alquimia.jpg';
 import festival from '../assets/fotos/festival-cruzeiro.jpg';
 import live from '../assets/fotos/live-caseira.jpg';
+import nave from '../assets/lugares/espaco-nave.jpg';
+import zepellin from '../assets/lugares/zepellin.jpg';
+import sarau from '../assets/lugares/sarau-psicodelico.jpg';
 
 export const banda = {
   nome: 'Contra Cultura',
@@ -41,19 +44,20 @@ export const lugares: Lugar[] = [
   { nome: 'Infinu', tipo: '', cidade: '', descricao: '', foto: infinu },
   { nome: 'UnB', tipo: 'Universidade', cidade: '', descricao: '', foto: unbPlateia },
   { nome: 'Festival de Rock no Cruzeiro', tipo: 'Festival', cidade: '', descricao: '', foto: festival },
+  { nome: 'Espaço Nave', tipo: '', cidade: '', descricao: '', foto: nave },
+  { nome: 'Zepellin', tipo: '', cidade: '', descricao: '', foto: zepellin },
   { nome: 'Alquimia Taberna Bar', tipo: 'Bar', cidade: '', descricao: '', foto: alquimia },
-  { nome: 'Sarau Psicodélico', tipo: 'Sarau', cidade: '', descricao: '' },
+  { nome: 'Sarau Psicodélico', tipo: 'Sarau', cidade: '', descricao: '', foto: sarau },
   { nome: 'Live Caseira', tipo: 'Live', cidade: '', descricao: '', foto: live },
 ];
 
-export const musicas = [
-  { titulo: 'Algo Parecido', lancamento: 'Setembro de 2022', producao: 'Gaico Music' },
-  { titulo: 'Animal', lancamento: 'Outubro de 2022', producao: 'Gaico Music' },
-];
+// Mesma ordem do perfil no Spotify
+export const musicas = [{ titulo: 'Lis-Lírio' }, { titulo: 'Animal' }, { titulo: 'Algo Parecido' }];
 
 export const videos = [
-  { titulo: 'Algo Parecido', youtubeId: 'OY0fS3AOQDw' },
-  { titulo: 'Animal', youtubeId: 'soFQTg9EfDw' },
+  { titulo: 'Animal', tipo: 'Clipe oficial', youtubeId: 'soFQTg9EfDw' },
+  { titulo: 'Algo Parecido', tipo: 'Clipe oficial', youtubeId: 'OY0fS3AOQDw' },
+  { titulo: 'Live Caseira', tipo: 'Live em clima de luau', youtubeId: 'dWnkKPz0Ubk' },
 ];
 
 export const integrantes = [
