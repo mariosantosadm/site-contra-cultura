@@ -1,0 +1,134 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
+import { lugares } from '../data/banda';
+---
+<section class="lugares" id="lugares" aria-labelledby="titulo-lugares" data-lugares>
+  <div class="lugares__fixo" data-lugares-fixo>
+    <div class="wrap lugares__cabeca">
+      <h2 id="titulo-lugares" class="display h2" data-reveal>Onde já tocamos</h2>
+      <p class="lede" data-reveal style="--i:1">
+        De bar a festival, de palco universitário a live em casa.
+      </p>
+    </div>
+
+    <div class="lugares__janela">
+      <ol class="lugares__trilho" data-lugares-trilho>
+        {lugares.map((l, i) => (
+          <li class:list={['lugar', { 'lugar--sem-foto': !l.foto }]}>
+            <figure class="lugar__foto">
+              {l.foto ? (
+                <Image src={l.foto} alt={`Contra Cultura no ${l.nome}`} widths={[480, 720, 960]} sizes="(max-width: 760px) 82vw, 34vw" />
+              ) : (
+                <div class="lugar__placa" aria-hidden="true">
+                  <Image src={logo} alt="" width={160} height={160} />
+                </div>
+              )}
+            </figure>
+            <div class="lugar__texto">
+              {(l.tipo || l.cidade) && (
+                <p class="lugar__tipo">{[l.tipo, l.cidade].filter(Boolean).join(', ')}</p>
+              )}
+              <h3 class="display lugar__nome">{l.nome}</h3>
+              {l.descricao && <p class="lugar__descricao">{l.descricao}</p>}
+              {l.link && <a class="lugar__link" href={l.link} target="_blank" rel="noopener">Ver o show</a>}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lugares { padding-top: clamp(32px, 6vw, 80px); }
+  .lugares__fixo {
+    min-height: 100svh;
+    padding-top: calc(var(--nav-h) + env(safe-area-inset-top, 0px) + 24px);
+    padding-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(32px, 4vw, 56px);
+  }
+  .lugares__cabeca {
+    display: grid;
+    gap: 20px;
+  }
+
+  .lugares__janela { overflow: hidden; }
+  .lugares__trilho {
+    list-style: none;
+    margin: 0;
+    display: flex;
+    gap: clamp(16px, 2vw, 28px);
+    padding-left: max(var(--gutter), env(safe-area-inset-left, 0px), calc((100vw - var(--max)) / 2 + var(--gutter)));
+    padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+    width: max-content;
+  }
+
+  .lugar {
+    width: clamp(220px, min(28vw, 39vh), 420px);
+    flex-shrink: 0;
+    display: grid;
+    gap: 18px;
+    align-content: start;
+  }
+  /* Ritmo: cartões alternam altura para não virar uma fileira igual */
+  .lugar:nth-child(even) { padding-top: clamp(0px, 3vw, 40px); }
+
+  .lugar__foto {
+    margin: 0;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--surface);
+    max-width: 100%;
+  }
+  .lugar__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
+  }
+  .lugar:hover .lugar__foto :global(img) { transform: scale(1.04); }
+
+  .lugar__placa {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 60%),
+      radial-gradient(circle at 85% 90%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 50%),
+      var(--surface);
+  }
+  .lugar__placa :global(img) { width: 38%; height: auto; opacity: 0.95; }
+
+  .lugar__tipo {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .lugar__nome {
+    font-size: clamp(34px, 3.4vw, 52px);
+    margin-top: 6px;
+  }
+  .lugar__descricao { color: var(--muted); margin-top: 10px; max-width: 36ch; }
+  .lugar__link { display: inline-block; margin-top: 10px; font-weight: 600; }
+
+  /* Celular: rolagem lateral com o dedo, encaixando cartão a cartão */
+  @media (max-width: 899px) {
+    .lugares__fixo { min-height: 0; padding-top: 0; padding-bottom: 0; }
+    .lugares__janela {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .lugares__janela::-webkit-scrollbar { display: none; }
+    .lugar { width: 78vw; scroll-snap-align: start; scroll-margin-left: var(--gutter); }
+    .lugar:nth-child(even) { padding-top: 0; }
+  }
+</style>

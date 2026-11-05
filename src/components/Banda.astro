@@ -1,0 +1,64 @@
+---
+import { Image } from 'astro:assets';
+import { integrantes } from '../data/banda';
+import paim from '../assets/fotos/membro-paim.jpg';
+import mamaco from '../assets/fotos/membro-mamaco.jpg';
+import jpeg from '../assets/fotos/membro-jpeg.jpg';
+
+const fotos: Record<string, ImageMetadata> = { Paim: paim, Mamaco: mamaco, JPEG: jpeg };
+---
+<section class="section banda" id="banda" aria-labelledby="titulo-banda-sec">
+  <div class="wrap">
+    <div class="banda__cabeca">
+      <h2 id="titulo-banda-sec" class="display h2" data-reveal>Três no palco</h2>
+      <p class="lede" data-reveal style="--i:1">
+        Guitarra, baixo e bateria. Rock nacional com músicas próprias, tocando junto desde 2021.
+      </p>
+    </div>
+    <ul class="banda__grade">
+      {integrantes.map((p, i) => (
+        <li class="membro" data-reveal style={`--i:${i}`}>
+          <div class="membro__foto">
+            <Image src={fotos[p.nome]} alt={`${p.nome}, ${p.funcao.toLowerCase()}`} widths={[480, 800]} sizes="(max-width: 760px) 100vw, 33vw" data-parallax={i === 1 ? '-6' : '6'} />
+          </div>
+          <p class="display membro__nome">{p.nome}</p>
+          <p class="membro__funcao">{p.funcao}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .banda__cabeca { display: grid; gap: 20px; margin-bottom: clamp(48px, 6vw, 88px); }
+  .banda__grade {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 28px);
+    align-items: start;
+  }
+  .membro:nth-child(2) { margin-top: clamp(0px, 9vw, 140px); }
+  .membro:nth-child(3) { margin-top: clamp(0px, 4vw, 60px); }
+  .membro__foto {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--surface);
+    max-width: 100%;
+  }
+  .membro__foto :global(img) {
+    width: 100%;
+    height: 112%;
+    object-fit: cover;
+    margin-top: -6%;
+  }
+  .membro__nome { font-size: clamp(44px, 5vw, 76px); margin-top: 20px; }
+  .membro__funcao { color: var(--muted); margin-top: 4px; }
+
+  @media (max-width: 760px) {
+    .banda__grade { grid-template-columns: 1fr; gap: 48px; }
+    .membro:nth-child(n) { margin-top: 0; }
+  }
+</style>

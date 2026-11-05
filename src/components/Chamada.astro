@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
+---
+<section class="chamada" aria-labelledby="titulo-chamada">
+  <div class="wrap chamada__inner">
+    <div class="chamada__texto">
+      <h2 id="titulo-chamada" class="display chamada__titulo" data-reveal>Leve a Contra Cultura para o seu palco</h2>
+      <p class="chamada__sub" data-reveal style="--i:1">Casa de show, bar, festival ou evento. Conte o que você precisa e a banda responde.</p>
+      <a class="btn btn--light" href="/contratar" data-reveal style="--i:2">Contratar</a>
+    </div>
+    <Image class="chamada__placa" src={logo} alt="" width={420} height={420} />
+  </div>
+</section>
+
+<style>
+  .chamada {
+    background: var(--accent);
+    color: #fff;
+    overflow: hidden;
+  }
+  .chamada__inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 40px;
+    padding-block: clamp(72px, 10vw, 140px);
+  }
+  .chamada__texto { display: grid; gap: 28px; justify-items: start; position: relative; z-index: 1; }
+  .chamada__titulo { font-size: clamp(52px, 7vw, 112px); max-width: 15ch; }
+  .chamada__sub { font-size: clamp(18px, 1.6vw, 21px); max-width: 44ch; color: rgb(255 255 255 / 0.88); }
+  .chamada__placa {
+    width: clamp(220px, 30vw, 420px);
+    height: auto;
+    filter: brightness(0) invert(1);
+    opacity: 0.16;
+    margin-right: calc(-1 * clamp(40px, 6vw, 120px));
+  }
+  @media (max-width: 760px) {
+    .chamada__inner { grid-template-columns: 1fr; }
+    .chamada__placa { position: absolute; right: -60px; bottom: -40px; width: 260px; margin: 0; }
+  }
+</style>

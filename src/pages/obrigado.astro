@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import { banda } from '../data/banda';
+---
+<Base titulo="Pedido enviado | Contra Cultura" descricao="Seu pedido de show chegou para a Contra Cultura.">
+  <section class="obrigado wrap">
+    <h1 class="display obrigado__titulo">Pedido enviado</h1>
+    <p class="lede">Recebemos o seu pedido. A banda responde pelo contato que você deixou. Se tiver pressa, chame no WhatsApp: {banda.telefone}.</p>
+    <a class="btn btn--accent" href="/">Voltar ao site</a>
+  </section>
+</Base>
+
+<style>
+  .obrigado {
+    min-height: 70vh;
+    padding-top: calc(var(--nav-h) + 96px);
+    padding-bottom: 96px;
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 28px;
+  }
+  .obrigado__titulo { font-size: clamp(64px, 10vw, 150px); }
+</style>

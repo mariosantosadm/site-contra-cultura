@@ -1,0 +1,150 @@
+---
+import { Image } from 'astro:assets';
+import banner from '../assets/fotos/banner.jpg';
+import logo from '../assets/logo.png';
+import { banda, lugares } from '../data/banda';
+---
+<section class="abertura" id="topo" aria-labelledby="titulo-banda">
+  <div class="wrap abertura__texto">
+    <h1 id="titulo-banda" class="display abertura__titulo">
+      <span class="abertura__palavra">Contra</span>
+      <span class="abertura__palavra">Cultura</span>
+    </h1>
+    <div class="abertura__linha">
+      <p class="lede abertura__resumo">{banda.resumo}</p>
+      <div class="abertura__acoes">
+        <a class="btn btn--accent" href="/contratar">Contratar</a>
+        <a class="btn btn--ghost" href="#som">Ouvir agora</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="abertura__palco" data-palco>
+    <div class="abertura__moldura" data-moldura>
+      <Image
+        src={banner}
+        alt="Paim, JPEG e Mamaco apoiados num parapeito, com o céu de Brasília ao fundo"
+        widths={[800, 1200, 1800, 2400]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        data-palco-foto
+      />
+    </div>
+  </div>
+
+  <div class="faixa" aria-label="Lugares onde a banda já tocou">
+    <div class="faixa__trilho">
+      {[0, 1].map((copia) => (
+        <ul class="faixa__lista" aria-hidden={copia === 1 ? 'true' : undefined}>
+          {lugares.map((l) => (
+            <li>
+              <span>{l.nome}</span>
+              <Image src={logo} alt="" width={22} height={22} />
+            </li>
+          ))}
+        </ul>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .abertura {
+    padding-top: calc(var(--nav-h) + env(safe-area-inset-top, 0px) + clamp(16px, 3vw, 40px));
+  }
+  .abertura__titulo {
+    font-size: clamp(64px, 12.2vw, 196px);
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.18em;
+    line-height: 0.84;
+    margin-left: -0.04em;
+  }
+  .abertura__palavra { display: inline-block; }
+  .abertura__linha {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px 40px;
+    margin-top: clamp(20px, 2.6vw, 36px);
+  }
+  .abertura__acoes { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .abertura__palco {
+    margin-top: clamp(28px, 4vw, 52px);
+    padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+  }
+  .abertura__moldura {
+    position: relative;
+    overflow: hidden;
+    height: min(74vh, 60vw);
+    min-height: 340px;
+    max-width: 100%;
+  }
+  .abertura__moldura :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 70%;
+    will-change: transform;
+  }
+
+  /* Faixa com os lugares: o único letreiro em movimento da página */
+  .faixa {
+    overflow: hidden;
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding-block: 18px;
+  }
+  .faixa__trilho { display: flex; width: max-content; }
+  .faixa__lista {
+    display: flex;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .faixa__lista li {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding-right: 28px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 62;
+    text-transform: uppercase;
+    font-size: clamp(26px, 3.2vw, 44px);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .faixa__lista :global(img) {
+    width: 22px;
+    height: 22px;
+    filter: brightness(0) invert(1);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .faixa__trilho { animation: faixa 38s linear infinite; }
+    .faixa:hover .faixa__trilho { animation-play-state: paused; }
+  }
+  @keyframes faixa { to { transform: translateX(-50%); } }
+
+  /* Entrada do título ao carregar */
+  @media (prefers-reduced-motion: no-preference) {
+    .abertura__palavra { animation: sobe 1.1s var(--ease-out) both; }
+    .abertura__palavra:nth-child(2) { animation-delay: 0.08s; }
+    .abertura__linha { animation: aparece 1s 0.35s var(--ease-out) both; }
+  }
+  @keyframes sobe { from { transform: translateY(0.35em); opacity: 0; } }
+  @keyframes aparece { from { opacity: 0; transform: translateY(12px); } }
+
+  @media (max-width: 760px) {
+    .abertura__titulo { font-size: clamp(64px, 25vw, 140px); }
+    .abertura__moldura { height: auto; min-height: 0; aspect-ratio: 4 / 3.4; }
+    .abertura__moldura :global(img) { object-position: 50% 80%; }
+    .abertura__acoes { width: 100%; }
+    .abertura__acoes .btn { flex: 1 1 0; }
+  }
+</style>

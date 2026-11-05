@@ -1,0 +1,42 @@
+---
+import { Image } from 'astro:assets';
+import prato from '../assets/fotos/show-prato.jpg';
+import palco from '../assets/fotos/infinu-palco.jpg';
+import unb from '../assets/lugares/unb-palco.jpg';
+
+const fotos = [
+  { src: palco, alt: 'A banda tocando sob luz vermelha, com o letreiro neon ao fundo', classe: 'g--grande' },
+  { src: prato, alt: 'Prato da bateria iluminado de rosa durante o show', classe: 'g--alto' },
+  { src: unb, alt: 'A banda no palco do auditório, com luz azul', classe: 'g--quadrado' },
+];
+---
+<section class="galeria" aria-label="Fotos de shows">
+  <div class="wrap galeria__grade">
+    {fotos.map((f, i) => (
+      <figure class={`galeria__item ${f.classe}`} data-reveal style={`--i:${i}`}>
+        <Image src={f.src} alt={f.alt} widths={[600, 1000, 1600]} sizes="(max-width: 760px) 100vw, 60vw" />
+      </figure>
+    ))}
+  </div>
+</section>
+
+<style>
+  .galeria { padding-bottom: clamp(80px, 12vw, 160px); }
+  .galeria__grade {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, clamp(180px, 22vw, 340px)));
+    gap: clamp(12px, 1.6vw, 22px);
+  }
+  .galeria__item { margin: 0; overflow: hidden; background: var(--surface); }
+  .galeria__item :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .g--grande { grid-column: 1 / 9; grid-row: 1 / 3; }
+  .g--alto { grid-column: 9 / 13; grid-row: 1 / 2; }
+  .g--quadrado { grid-column: 9 / 13; grid-row: 2 / 3; }
+
+  @media (max-width: 760px) {
+    .galeria__grade { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .g--grande { grid-column: 1 / 3; grid-row: auto; aspect-ratio: 4 / 3; }
+    .g--alto, .g--quadrado { grid-column: auto; grid-row: auto; aspect-ratio: 1; }
+  }
+</style>

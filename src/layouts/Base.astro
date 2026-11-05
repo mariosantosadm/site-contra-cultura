@@ -1,0 +1,49 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Rodape from '../components/Rodape.astro';
+import ogImage from '../assets/fotos/banner.jpg';
+import { getImage } from 'astro:assets';
+
+interface Props {
+  titulo: string;
+  descricao: string;
+}
+const { titulo, descricao } = Astro.props;
+const og = await getImage({ src: ogImage, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+const ogUrl = new URL(og.src, Astro.site);
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{titulo}</title>
+    <meta name="description" content={descricao} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0e0d10" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f3f2f0" media="(prefers-color-scheme: light)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descricao} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body>
+    <Nav />
+    <main id="conteudo">
+      <slot />
+    </main>
+    <Rodape />
+    <script>
+      import '../scripts/movimento.ts';
+    </script>
+  </body>
+</html>

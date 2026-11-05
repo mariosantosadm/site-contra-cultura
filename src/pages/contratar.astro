@@ -1,0 +1,162 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import { banda, lugares } from '../data/banda';
+import foto from '../assets/fotos/infinu-palco.jpg';
+
+const fatos = [
+  { rotulo: 'Formação', valor: 'Power trio: guitarra, baixo e bateria, com Paim e Mamaco nos vocais' },
+  { rotulo: 'Som', valor: 'Rock nacional autoral' },
+  { rotulo: 'Base', valor: 'Brasília, DF' },
+  { rotulo: 'Já tocou em', valor: lugares.map((l) => l.nome).join(', ') },
+];
+---
+<Base
+  titulo="Contratar a Contra Cultura | Rock autoral para o seu palco"
+  descricao="Peça um show da Contra Cultura, power trio de rock nacional autoral de Brasília. Formulário, WhatsApp e e-mail."
+>
+  <section class="contratar">
+    <div class="wrap contratar__grid">
+      <div class="contratar__info">
+        <h1 class="display contratar__titulo">Leve a banda para o seu palco</h1>
+        <p class="lede">Conte sobre a casa ou o evento. A banda responde pelo contato que você deixar.</p>
+
+        <dl class="fatos">
+          {fatos.map((f) => (
+            <div class="fato">
+              <dt>{f.rotulo}</dt>
+              <dd>{f.valor}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div class="direto">
+          <a class="btn btn--accent" href={banda.whatsapp} target="_blank" rel="noopener">
+            <Icone nome="whatsapp" tamanho={18} /> Chamar no WhatsApp
+          </a>
+          <p class="direto__linhas">
+            <a href={`mailto:${banda.email}`}>{banda.email}</a>
+            <span>{banda.telefone}</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="contratar__form-col">
+        <figure class="contratar__foto">
+          <Image src={foto} alt="A banda ao vivo sob luz vermelha" widths={[600, 1000]} sizes="(max-width: 900px) 100vw, 45vw" loading="eager" />
+        </figure>
+
+        <form class="form" name="pedido-de-show" method="POST" action="/obrigado" data-netlify="true" netlify-honeypot="sobrenome-do-robo">
+          <input type="hidden" name="form-name" value="pedido-de-show" />
+          <p class="sr-only"><label>Não preencha: <input name="sobrenome-do-robo" /></label></p>
+
+          <h2 class="display form__titulo">Pedido de show</h2>
+
+          <div class="campo">
+            <label for="nome">Seu nome</label>
+            <input id="nome" name="nome" type="text" autocomplete="name" required />
+          </div>
+          <div class="campo">
+            <label for="local">Casa ou evento</label>
+            <input id="local" name="local" type="text" required />
+          </div>
+          <div class="form__dupla">
+            <div class="campo">
+              <label for="cidade">Cidade</label>
+              <input id="cidade" name="cidade" type="text" autocomplete="address-level2" />
+            </div>
+            <div class="campo">
+              <label for="data">Data desejada</label>
+              <input id="data" name="data" type="date" />
+              <span class="campo__ajuda">Opcional</span>
+            </div>
+          </div>
+          <div class="campo">
+            <label for="contato">WhatsApp ou e-mail para resposta</label>
+            <input id="contato" name="contato" type="text" autocomplete="email" required />
+          </div>
+          <div class="campo">
+            <label for="mensagem">Conte um pouco sobre o evento</label>
+            <textarea id="mensagem" name="mensagem" rows="5" placeholder="Tipo de evento, horário, duração do show, estrutura de som"></textarea>
+          </div>
+          <button class="btn btn--accent form__enviar" type="submit">Enviar pedido</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contratar {
+    padding-top: calc(var(--nav-h) + env(safe-area-inset-top, 0px) + clamp(40px, 6vw, 88px));
+    padding-bottom: clamp(80px, 10vw, 140px);
+  }
+  .contratar__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(48px, 6vw, 96px);
+    align-items: start;
+  }
+  .contratar__info { display: grid; gap: 28px; }
+  .contratar__titulo { font-size: clamp(56px, 7.4vw, 116px); max-width: 12ch; }
+
+  .fatos { margin: 12px 0 0; display: grid; }
+  .fato {
+    display: grid;
+    grid-template-columns: 9.5em minmax(0, 1fr);
+    gap: 16px;
+    padding-block: 18px;
+    border-top: 1px solid var(--line);
+  }
+  .fato:last-child { border-bottom: 1px solid var(--line); }
+  .fato dt { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); padding-top: 3px; }
+  .fato dd { margin: 0; font-size: 18px; }
+
+  .direto { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px; margin-top: 8px; }
+  .direto__linhas { display: grid; gap: 2px; color: var(--muted); }
+  .direto__linhas a { color: var(--ink); font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
+  .direto__linhas a:hover { color: var(--accent); }
+
+  .contratar__form-col { display: grid; gap: 0; min-width: 0; }
+  .contratar__foto { margin: 0; aspect-ratio: 16 / 10; overflow: hidden; max-width: 100%; }
+  .contratar__foto :global(img) { width: 100%; height: 100%; object-fit: cover; }
+
+  .form {
+    background: var(--surface);
+    padding: clamp(24px, 3vw, 40px);
+    display: grid;
+    gap: 20px;
+  }
+  .form__titulo { font-size: clamp(36px, 3.4vw, 52px); }
+  .form__dupla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .campo { display: grid; gap: 8px; min-width: 0; }
+  .campo label { font-weight: 600; font-size: 15px; }
+  .campo__ajuda { font-size: 13px; color: var(--muted); }
+  .campo input, .campo textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: 0;
+    padding: 12px 14px;
+    min-height: 50px;
+    transition: border-color 0.2s;
+  }
+  .campo textarea { resize: vertical; }
+  .campo input::placeholder, .campo textarea::placeholder { color: var(--muted); }
+  .campo input:hover, .campo textarea:hover { border-color: var(--muted); }
+  .campo input:focus, .campo textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent); }
+  .campo input:user-invalid { border-color: var(--accent); }
+  .form__enviar { width: 100%; margin-top: 4px; }
+
+  @media (max-width: 900px) {
+    .contratar__grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 520px) {
+    .form__dupla { grid-template-columns: 1fr; }
+    .fato { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>

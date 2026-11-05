@@ -1,0 +1,85 @@
+---
+import { banda, redes } from '../data/banda';
+import Icone from './Icone.astro';
+const ano = new Date().getFullYear();
+---
+<footer class="rodape" id="contato">
+  <div class="wrap rodape__grid">
+    <div class="rodape__principal">
+      <h2 class="display rodape__titulo" data-reveal>Fale com a banda</h2>
+      <div class="rodape__contatos" data-reveal style="--i:1">
+        <a class="rodape__grande" href={`mailto:${banda.email}`}>{banda.email}</a>
+        <a class="rodape__grande" href={banda.whatsapp} target="_blank" rel="noopener">{banda.telefone}</a>
+      </div>
+    </div>
+    <ul class="rodape__redes" aria-label="Redes sociais">
+      {redes.map((r) => (
+        <li>
+          <a href={r.url} target="_blank" rel="noopener">
+            <Icone nome={r.icone} tamanho={20} />
+            <span>{r.nome}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="rodape__fim">© {ano} Contra Cultura. Rock nacional autoral, Brasília.</p>
+  </div>
+</footer>
+
+<style>
+  .rodape {
+    border-top: 1px solid var(--line);
+    padding-block: clamp(72px, 10vw, 140px) 40px;
+  }
+  .rodape__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 56px 40px;
+    align-items: end;
+  }
+  .rodape__titulo { font-size: clamp(56px, 10vw, 150px); }
+  .rodape__contatos {
+    display: grid;
+    gap: 6px;
+    margin-top: 32px;
+  }
+  .rodape__grande {
+    font-size: clamp(20px, 2.6vw, 34px);
+    font-weight: 600;
+    text-decoration: none;
+    width: fit-content;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0 3px no-repeat;
+    transition: background-size 0.4s var(--ease-out);
+  }
+  .rodape__grande:hover { background-size: 100% 3px; }
+  .rodape__redes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+  }
+  .rodape__redes a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    font-weight: 500;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .rodape__redes a:hover { color: var(--accent); }
+  .rodape__fim {
+    grid-column: 1 / -1;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 14px;
+  }
+  @media (max-width: 760px) {
+    .rodape__grid { grid-template-columns: 1fr; }
+    .rodape__redes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>

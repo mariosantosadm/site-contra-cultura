@@ -1,0 +1,22 @@
+---
+// Ícones de marca vindos do pacote simple-icons (não desenhados à mão).
+import { siInstagram, siYoutube, siSpotify, siTiktok, siWhatsapp } from 'simple-icons';
+
+const mapa = {
+  instagram: siInstagram,
+  youtube: siYoutube,
+  spotify: siSpotify,
+  tiktok: siTiktok,
+  whatsapp: siWhatsapp,
+} as const;
+
+interface Props {
+  nome: keyof typeof mapa;
+  tamanho?: number;
+}
+const { nome, tamanho = 20 } = Astro.props;
+const icone = mapa[nome];
+---
+<svg width={tamanho} height={tamanho} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+  <path d={icone.path} />
+</svg>
