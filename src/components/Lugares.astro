@@ -2,23 +2,35 @@
 import { Image } from 'astro:assets';
 import logo from '../assets/logo.png';
 import { lugares } from '../data/banda';
+import setaEsq from '@phosphor-icons/core/assets/bold/arrow-left-bold.svg?raw';
+import setaDir from '@phosphor-icons/core/assets/bold/arrow-right-bold.svg?raw';
 ---
 <section class="lugares" id="lugares" aria-labelledby="titulo-lugares" data-lugares>
   <div class="lugares__fixo" data-lugares-fixo>
     <div class="wrap lugares__cabeca">
-      <h2 id="titulo-lugares" class="display h2" data-reveal>Onde já tocamos</h2>
-      <p class="lede lugares__lede" data-reveal style="--i:1">
-        Diferentes palcos. A mesma intensidade. A energia nunca muda.
-      </p>
+      <div class="lugares__titulos">
+        <h2 id="titulo-lugares" class="display h2" data-reveal>Onde já tocamos</h2>
+        <p class="lede lugares__lede" data-reveal style="--i:1">
+          Diferentes palcos. A mesma intensidade. A energia nunca muda.
+        </p>
+      </div>
+      <div class="lugares__setas" data-reveal style="--i:2">
+        <button class="seta" type="button" data-lugares-ant aria-label="Lugar anterior" aria-controls="trilho-lugares" disabled>
+          <Fragment set:html={setaEsq} />
+        </button>
+        <button class="seta" type="button" data-lugares-prox aria-label="Próximo lugar" aria-controls="trilho-lugares">
+          <Fragment set:html={setaDir} />
+        </button>
+      </div>
     </div>
 
     <div class="lugares__janela">
-      <ol class="lugares__trilho" data-lugares-trilho>
+      <ol class="lugares__trilho" id="trilho-lugares" data-lugares-trilho>
         {lugares.map((l, i) => (
-          <li class:list={['lugar', { 'lugar--sem-foto': !l.foto }]}>
+          <li class:list={['lugar', { 'lugar--sem-foto': !l.foto }]} style={`--ratio:${l.foto ? (l.foto.width / l.foto.height).toFixed(4) : '0.8'}`} data-lugar>
             <figure class="lugar__foto">
               {l.foto ? (
-                <Image src={l.foto} alt={`Contra Cultura no ${l.nome}`} widths={[480, 720, 960]} sizes="(max-width: 760px) 82vw, 34vw" />
+                <Image src={l.foto} alt={`Contra Cultura no ${l.nome}`} widths={[480, 800, 1200]} sizes="(max-width: 899px) 86vw, 60vw" />
               ) : (
                 <div class="lugar__placa" aria-hidden="true">
                   <Image src={logo} alt="" width={160} height={160} />
@@ -52,39 +64,64 @@ import { lugares } from '../data/banda';
     gap: clamp(32px, 4vw, 56px);
   }
   .lugares__cabeca {
-    display: grid;
-    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px 40px;
   }
-
+  .lugares__titulos { display: grid; gap: 20px; }
   .lugares__lede { max-width: 62ch; }
+
+  .lugares__setas { display: flex; gap: 10px; }
+  .seta {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 2px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out), border-color 0.25s var(--ease-out), opacity 0.25s, transform 0.15s var(--ease-out);
+  }
+  .seta :global(svg) { width: 22px; height: 22px; }
+  @media (hover: hover) {
+    .seta:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: #fff; }
+  }
+  .seta:active:not(:disabled) { transform: scale(0.96); }
+  .seta:disabled { opacity: 0.3; cursor: default; }
+
   .lugares__janela { overflow: hidden; }
   .lugares__trilho {
     list-style: none;
     margin: 0;
     display: flex;
+    align-items: flex-start;
     gap: clamp(16px, 2vw, 28px);
     padding-left: max(var(--gutter), env(safe-area-inset-left, 0px), calc((100vw - var(--max)) / 2 + var(--gutter)));
     padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
     width: max-content;
   }
 
+  /* Todas as fotos com a mesma altura e cada uma no formato original, sem corte.
+     A altura acompanha a tela para o cartão inteiro caber enquanto a seção fica presa. */
   .lugar {
-    /* Largura calculada pela altura da tela, para o cartão inteiro caber enquanto a seção fica presa */
-    width: clamp(200px, min(28vw, calc((100svh - 420px) / var(--proporcao, 1.25))), 420px);
+    --altura: clamp(220px, calc(100svh - 400px), 520px);
+    width: calc(var(--altura) * var(--ratio));
     flex-shrink: 0;
     display: grid;
-    gap: 18px;
+    gap: 16px;
     align-content: start;
   }
-  /* Ritmo: cartões alternam altura para não virar uma fileira igual */
-  .lugar:nth-child(even) { padding-top: clamp(0px, 3vw, 40px); }
 
   .lugar__foto {
     margin: 0;
-    aspect-ratio: 1 / var(--proporcao, 1.25);
+    width: 100%;
+    aspect-ratio: var(--ratio);
     overflow: hidden;
     background: var(--surface);
-    max-width: 100%;
   }
   .lugar__foto :global(img) {
     width: 100%;
@@ -92,7 +129,7 @@ import { lugares } from '../data/banda';
     object-fit: cover;
     transition: transform 1.2s var(--ease-out);
   }
-  .lugar:hover .lugar__foto :global(img) { transform: scale(1.04); }
+  .lugar:hover .lugar__foto :global(img) { transform: scale(1.03); }
 
   .lugar__placa {
     width: 100%;
@@ -114,29 +151,30 @@ import { lugares } from '../data/banda';
     color: var(--accent);
   }
   .lugar__nome {
-    font-size: clamp(30px, min(3.4vw, 5vh), 52px);
-    margin-top: 6px;
+    font-size: clamp(28px, min(3vw, 4.6vh), 48px);
+    margin-top: 4px;
   }
   .lugar__descricao { color: var(--muted); margin-top: 10px; max-width: 36ch; }
   .lugar__link { display: inline-block; margin-top: 10px; font-weight: 600; }
 
-  /* Telas baixas (notebook): fotos quadradas para o cartão caber inteiro */
-  @media (min-width: 900px) and (max-height: 820px) {
-    .lugar { --proporcao: 1; }
-    .lugar:nth-child(even) { padding-top: 0; }
-  }
-
-  /* Celular: rolagem lateral com o dedo, encaixando cartão a cartão */
+  /* Celular: rolagem lateral com o dedo ou pelas setas, encaixando foto a foto */
   @media (max-width: 899px) {
     .lugares__fixo { min-height: 0; padding-top: 0; padding-bottom: 0; }
+    .lugares__setas { margin-left: auto; }
+    .seta { width: 48px; height: 48px; }
     .lugares__janela {
       overflow-x: auto;
       scroll-snap-type: x mandatory;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
     }
     .lugares__janela::-webkit-scrollbar { display: none; }
-    .lugar { width: 78vw; scroll-snap-align: start; scroll-margin-left: var(--gutter); }
-    .lugar:nth-child(even) { padding-top: 0; }
+    .lugar {
+      --altura: min(58vw, 340px);
+      max-width: 86vw;
+      scroll-snap-align: start;
+      scroll-margin-left: var(--gutter);
+    }
   }
 </style>

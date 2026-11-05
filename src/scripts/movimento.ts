@@ -68,28 +68,67 @@ mm.add('(prefers-reduced-motion: no-preference)', () => {
       .fromTo(foto, { scale: 1.14 }, { scale: 1, ease: 'none' }, 0);
   }
 
-  // Retratos com leve profundidade
-  document.querySelectorAll<HTMLElement>('[data-parallax]').forEach((img) => {
-    const forca = Number(img.dataset.parallax ?? 6);
-    gsap.fromTo(
-      img,
-      { yPercent: -forca },
-      { yPercent: forca, ease: 'none', scrollTrigger: { trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } },
-    );
-  });
 });
+
+let lugaresST: ScrollTrigger | null = null;
+
+// Setas dos lugares: funcionam no celular (rolagem lateral) e no computador (seção presa)
+const janela = document.querySelector<HTMLElement>('.lugares__janela');
+const trilhoLugares = document.querySelector<HTMLElement>('[data-lugares-trilho]');
+const btnAnt = document.querySelector<HTMLButtonElement>('[data-lugares-ant]');
+const btnProx = document.querySelector<HTMLButtonElement>('[data-lugares-prox]');
+const cartoes = Array.from(document.querySelectorAll<HTMLElement>('[data-lugar]'));
+
+function posicoes() {
+  if (!trilhoLugares || !cartoes.length) return [];
+  const inicio = cartoes[0].offsetLeft;
+  return cartoes.map((c) => c.offsetLeft - inicio);
+}
+
+function estado() {
+  // Onde o trilho está agora e até onde ele pode ir
+  if (lugaresST) {
+    const max = lugaresST.end - lugaresST.start;
+    const atual = Math.min(max, Math.max(0, window.scrollY - lugaresST.start));
+    return { atual, max };
+  }
+  if (janela) return { atual: janela.scrollLeft, max: janela.scrollWidth - janela.clientWidth };
+  return { atual: 0, max: 0 };
+}
+
+function atualizaSetas() {
+  if (!btnAnt || !btnProx) return;
+  const { atual, max } = estado();
+  btnAnt.disabled = atual <= 4;
+  btnProx.disabled = atual >= max - 4;
+}
+
+function vaiPara(direcao: 1 | -1) {
+  const { atual, max } = estado();
+  const pos = posicoes();
+  const alvo =
+    direcao === 1
+      ? pos.find((p) => p > atual + 8) ?? max
+      : [...pos].reverse().find((p) => p < atual - 8) ?? 0;
+  const destino = Math.min(max, Math.max(0, alvo));
+  const suave = reduzir.matches ? 'auto' : 'smooth';
+  if (lugaresST) {
+    window.scrollTo({ top: lugaresST.start + destino, behavior: suave });
+  } else if (janela) {
+    janela.scrollTo({ left: destino, behavior: suave });
+  }
+}
 
 // Lugares: no computador, a seção fica presa e os palcos passam de lado
 mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
-  const secao = document.querySelector<HTMLElement>('[data-lugares]');
   const fixo = document.querySelector<HTMLElement>('[data-lugares-fixo]');
   const trilho = document.querySelector<HTMLElement>('[data-lugares-trilho]');
-  if (!secao || !fixo || !trilho) return;
+  if (!fixo || !trilho) return;
 
   const distancia = () => Math.max(0, trilho.scrollWidth - document.documentElement.clientWidth);
   if (distancia() < 40) return;
 
-  gsap.to(trilho, {
+  const tween = gsap.to(trilho, {
     x: () => -distancia(),
     ease: 'none',
     scrollTrigger: {
@@ -100,9 +139,21 @@ mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
       scrub: 0.8,
       invalidateOnRefresh: true,
       anticipatePin: 1,
+      onUpdate: () => atualizaSetas(),
+      onRefresh: () => atualizaSetas(),
     },
   });
+  lugaresST = tween.scrollTrigger ?? null;
+  return () => {
+    lugaresST = null;
+  };
 });
+
+btnAnt?.addEventListener('click', () => vaiPara(-1));
+btnProx?.addEventListener('click', () => vaiPara(1));
+janela?.addEventListener('scroll', atualizaSetas, { passive: true });
+window.addEventListener('resize', atualizaSetas);
+atualizaSetas();
 
 // Recalcula depois que as imagens carregam (alturas mudam)
 window.addEventListener('load', () => ScrollTrigger.refresh());
