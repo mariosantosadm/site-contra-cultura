@@ -11,6 +11,9 @@ import live from '../assets/fotos/live-caseira.jpg';
 import nave from '../assets/lugares/espaco-nave.jpg';
 import zepellin from '../assets/lugares/zepellin.jpg';
 import sarau from '../assets/lugares/sarau-psicodelico.jpg';
+import galeriaPalco from '../assets/fotos/infinu-palco.jpg';
+import galeriaPrato from '../assets/fotos/show-prato.jpg';
+import galeriaUnb from '../assets/lugares/unb-palco.jpg';
 
 export const banda = {
   nome: 'Contra Cultura',
@@ -32,7 +35,7 @@ export const spotifyArtistaId = '4CO1UCaW6eieOQo84D9gAU';
 
 export type Lugar = {
   nome: string;
-  tipo: string; // ex.: 'Bar', 'Festival', 'Universidade'
+  tipo: string; // não aparece no site por enquanto; serve de anotação
   cidade: string; // TODO: preencher quando o Mário informar
   descricao: string; // TODO: 1 a 2 frases sobre o show
   foto?: ImageMetadata;
@@ -48,7 +51,7 @@ export const lugares: Lugar[] = [
   { nome: 'Zepellin', tipo: '', cidade: '', descricao: '', foto: zepellin },
   { nome: 'Alquimia Taberna Bar', tipo: 'Bar', cidade: '', descricao: '', foto: alquimia },
   { nome: 'Sarau Psicodélico', tipo: 'Sarau', cidade: '', descricao: '', foto: sarau },
-  { nome: 'Live Caseira', tipo: 'Live', cidade: '', descricao: '', foto: live },
+  { nome: 'Live (luau)', tipo: 'Live', cidade: '', descricao: '', foto: live },
 ];
 
 // Mesma ordem do perfil no Spotify
@@ -57,11 +60,19 @@ export const musicas = [{ titulo: 'Lis-Lírio' }, { titulo: 'Animal' }, { titulo
 export const videos = [
   { titulo: 'Animal', tipo: 'Clipe oficial', youtubeId: 'soFQTg9EfDw' },
   { titulo: 'Algo Parecido', tipo: 'Clipe oficial', youtubeId: 'OY0fS3AOQDw' },
-  { titulo: 'Live Caseira', tipo: 'Live em clima de luau', youtubeId: 'dWnkKPz0Ubk' },
+  { titulo: 'Live (luau)', tipo: 'Show ao vivo', youtubeId: 'dWnkKPz0Ubk' },
 ];
 
 export const integrantes = [
   { nome: 'Paim', funcao: 'Guitarra e voz' },
   { nome: 'Mamaco', funcao: 'Baixo e voz' },
   { nome: 'JPEG', funcao: 'Bateria e backing vocal' },
+];
+
+// Galeria: para incluir uma foto, coloque o arquivo em src/assets/galeria/,
+// importe no topo deste arquivo e acrescente uma linha aqui. A grade se ajusta sozinha.
+export const galeria: { foto: ImageMetadata; legenda: string }[] = [
+  { foto: galeriaPalco, legenda: 'A banda tocando sob luz vermelha, com o letreiro neon ao fundo' },
+  { foto: galeriaPrato, legenda: 'Prato da bateria iluminado de rosa durante o show' },
+  { foto: galeriaUnb, legenda: 'A banda no palco do auditório, com luz azul' },
 ];

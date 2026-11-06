@@ -38,9 +38,6 @@ import setaDir from '@phosphor-icons/core/assets/bold/arrow-right-bold.svg?raw';
               )}
             </figure>
             <div class="lugar__texto">
-              {(l.tipo || l.cidade) && (
-                <p class="lugar__tipo">{[l.tipo, l.cidade].filter(Boolean).join(', ')}</p>
-              )}
               <h3 class="display lugar__nome">{l.nome}</h3>
               {l.descricao && <p class="lugar__descricao">{l.descricao}</p>}
               {l.link && <a class="lugar__link" href={l.link} target="_blank" rel="noopener">Ver o show</a>}
@@ -143,13 +140,6 @@ import setaDir from '@phosphor-icons/core/assets/bold/arrow-right-bold.svg?raw';
   }
   .lugar__placa :global(img) { width: 38%; height: auto; opacity: 0.95; }
 
-  .lugar__tipo {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
   .lugar__nome {
     font-size: clamp(28px, min(3vw, 4.6vh), 48px);
     margin-top: 4px;

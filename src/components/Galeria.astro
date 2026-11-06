@@ -1,42 +1,135 @@
 ---
-import { Image } from 'astro:assets';
-import prato from '../assets/fotos/show-prato.jpg';
-import palco from '../assets/fotos/infinu-palco.jpg';
-import unb from '../assets/lugares/unb-palco.jpg';
+import { Image, getImage } from 'astro:assets';
+import { galeria } from '../data/banda';
+import fechar from '@phosphor-icons/core/assets/bold/x-bold.svg?raw';
 
-const fotos = [
-  { src: palco, alt: 'A banda tocando sob luz vermelha, com o letreiro neon ao fundo', classe: 'g--grande' },
-  { src: prato, alt: 'Prato da bateria iluminado de rosa durante o show', classe: 'g--alto' },
-  { src: unb, alt: 'A banda no palco do auditório, com luz azul', classe: 'g--quadrado' },
-];
+// As fotos entram em grupos de três: uma grande e duas menores, alternando o lado.
+// Um grupo incompleto no fim divide a linha igualmente, sem deixar buraco.
+const total = galeria.length;
+const resto = total % 3;
+const fotos = await Promise.all(
+  galeria.map(async (g, i) => {
+    const grupo = Math.floor(i / 3);
+    const posicao = i % 3;
+    const ultimoGrupoIncompleto = resto !== 0 && i >= total - resto;
+    let classe = 'g--pequena';
+    if (ultimoGrupoIncompleto) classe = resto === 1 ? 'g--inteira' : 'g--metade';
+    else if (posicao === 0) classe = grupo % 2 === 0 ? 'g--grande' : 'g--grande g--direita';
+    const grande = await getImage({ src: g.foto, width: 2000, format: 'webp' });
+    return { ...g, classe, grande: grande.src };
+  }),
+);
 ---
-<section class="galeria" aria-label="Fotos de shows">
-  <div class="wrap galeria__grade">
-    {fotos.map((f, i) => (
-      <figure class={`galeria__item ${f.classe}`} data-reveal style={`--i:${i}`}>
-        <Image src={f.src} alt={f.alt} widths={[600, 1000, 1600]} sizes="(max-width: 760px) 100vw, 60vw" />
-      </figure>
-    ))}
+<section class="galeria" id="galeria" aria-labelledby="titulo-galeria">
+  <div class="wrap">
+    <h2 id="titulo-galeria" class="display h2 galeria__titulo" data-reveal>Galeria</h2>
+    <ul class="galeria__grade">
+      {fotos.map((f, i) => (
+        <li class={`galeria__item ${f.classe}`} data-reveal style={`--i:${i % 3}`}>
+          <button type="button" class="galeria__abrir" data-galeria-abrir={f.grande} data-legenda={f.legenda} aria-label={`Ampliar foto: ${f.legenda}`}>
+            <Image src={f.foto} alt={f.legenda} widths={[600, 1000, 1600]} sizes="(max-width: 760px) 100vw, 66vw" />
+          </button>
+        </li>
+      ))}
+    </ul>
   </div>
+
+  <dialog class="visor" data-visor aria-label="Foto ampliada">
+    <button type="button" class="visor__fechar" data-visor-fechar aria-label="Fechar">
+      <Fragment set:html={fechar} />
+    </button>
+    <img class="visor__foto" data-visor-foto alt="" />
+  </dialog>
 </section>
+
+<script>
+  const visor = document.querySelector<HTMLDialogElement>('[data-visor]');
+  const foto = document.querySelector<HTMLImageElement>('[data-visor-foto]');
+  document.querySelectorAll<HTMLButtonElement>('[data-galeria-abrir]').forEach((b) => {
+    b.addEventListener('click', () => {
+      if (!visor || !foto) return;
+      foto.src = b.dataset.galeriaAbrir ?? '';
+      foto.alt = b.dataset.legenda ?? '';
+      visor.showModal();
+    });
+  });
+  document.querySelector('[data-visor-fechar]')?.addEventListener('click', () => visor?.close());
+  // Clicar fora da foto também fecha
+  visor?.addEventListener('click', (e) => {
+    if (e.target === visor) visor.close();
+  });
+</script>
 
 <style>
   .galeria { padding-bottom: clamp(80px, 12vw, 160px); }
+  .galeria__titulo { margin-bottom: clamp(32px, 4vw, 56px); }
   .galeria__grade {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(0, clamp(180px, 22vw, 340px)));
+    grid-auto-rows: clamp(160px, 19vw, 300px);
+    grid-auto-flow: row dense;
     gap: clamp(12px, 1.6vw, 22px);
   }
-  .galeria__item { margin: 0; overflow: hidden; background: var(--surface); }
-  .galeria__item :global(img) { width: 100%; height: 100%; object-fit: cover; }
-  .g--grande { grid-column: 1 / 9; grid-row: 1 / 3; }
-  .g--alto { grid-column: 9 / 13; grid-row: 1 / 2; }
-  .g--quadrado { grid-column: 9 / 13; grid-row: 2 / 3; }
+  .galeria__item { margin: 0; overflow: hidden; background: var(--surface); min-width: 0; }
+  .g--pequena { grid-column: span 4; }
+  .g--grande { grid-column: span 8; grid-row: span 2; }
+  .g--grande.g--direita { grid-column: 5 / span 8; }
+  .g--metade { grid-column: span 6; grid-row: span 2; }
+  .g--inteira { grid-column: 1 / -1; grid-row: span 2; }
+
+  .galeria__abrir {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+  .galeria__abrir :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
+  }
+  .galeria__abrir:hover :global(img) { transform: scale(1.03); }
+
+  .visor {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: max(56px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    border: 0;
+    background: rgb(10 9 12 / 0.97);
+    place-items: center;
+  }
+  .visor[open] { display: grid; }
+  .visor::backdrop { background: transparent; }
+  .visor__foto { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+  .visor__fechar {
+    position: absolute;
+    top: max(12px, env(safe-area-inset-top, 0px));
+    right: max(12px, env(safe-area-inset-right, 0px));
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border: 2px solid #f1efec;
+    background: transparent;
+    color: #f1efec;
+    cursor: pointer;
+  }
+  .visor__fechar :global(svg) { width: 20px; height: 20px; }
+  .visor__fechar:hover { background: #f1efec; color: #131215; }
 
   @media (max-width: 760px) {
-    .galeria__grade { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
-    .g--grande { grid-column: 1 / 3; grid-row: auto; aspect-ratio: 4 / 3; }
-    .g--alto, .g--quadrado { grid-column: auto; grid-row: auto; aspect-ratio: 1; }
+    .galeria__grade { grid-template-columns: 1fr 1fr; grid-auto-rows: 42vw; }
+    .g--pequena { grid-column: span 1; }
+    .g--grande, .g--grande.g--direita, .g--metade, .g--inteira { grid-column: 1 / -1; grid-row: span 2; }
   }
 </style>
